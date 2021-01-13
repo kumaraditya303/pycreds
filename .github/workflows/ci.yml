@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  build:
+    env:
+      DISPLAY: ":99.0"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.7", "3.8", "3.9"]
+        os: [windows-latest, macos-latest, ubuntu-latest, macos-11.0]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        if: startsWith(runner.os, 'macOS')
+        with:
+          path: ~/Library/Caches/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        if: matrix.os == 'ubuntu-latest'
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install additional dependencies
+        run: |
+          sudo apt-get install xvfb \
+                             gnome-keyring \
+                             libsecret-1-dev \
+                             dbus-x11 \
+                             libsecret-tools
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip wheel
+          pip install -r requirements.txt
+          pip install -e . -vv
+      - name: Lint
+        run: pre-commit run --all-files
+      - name: Build Wheels
+        run: python setup.py bdist_wheel -vv
+      - name: Upload Wheels
+        uses: actions/upload-artifact@v2
+        with:
+          name: wheels
+          path: dist/*.whl
+      - name: Test with PyTest
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          echo "activating dbus..."
+          export "$(dbus-launch)"
+          echo "activating gnome-keyring daemon..."
+          echo "" | gnome-keyring-daemon --unlock
+          gnome-keyring-daemon --start --daemonize --components=secrets
+          export "$(echo "" | gnome-keyring-daemon -r -d --unlock)"
+          pytest
+      - name: Test with PyTest
+        if: ${{ matrix.os != 'ubuntu-latest' }}
+        run: pytest
+      - name: Upload Coverage Report
+        uses: codecov/codecov-action@v1.2.1
