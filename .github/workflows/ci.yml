@@ -48,13 +48,14 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install --upgrade pip wheel
+          pip install --upgrade pip
+          pip install --upgrade wheel build
           pip install -r requirements.txt
-          pip install -e . -vv
+          pip install -e.
       - name: Lint
         run: pre-commit run --all-files
       - name: Build Wheels
-        run: python setup.py bdist_wheel -vv
+        run: python -m build
       - name: Upload Wheels
         uses: actions/upload-artifact@v2
         with:
