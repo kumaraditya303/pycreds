@@ -2,6 +2,7 @@
 import platform
 from pathlib import Path
 
+from pybind11 import get_include
 from setuptools import Extension, setup
 
 ext_modules = []
@@ -12,7 +13,7 @@ if "Windows" == platform.system():
             "pycreds._pycreds",
             libraries=["advapi32"],
             sources=["./pycreds/pycreds_win.cpp"],
-            include_dirs=["./third_party/pybind11/include"],
+            include_dirs=[get_include()],
             language="c++",
             extra_compile_args=["/MT"],
         )
@@ -25,10 +26,11 @@ elif "Linux" == platform.system():
             sources=["./pycreds/pycreds_posix.cpp"],
             include_dirs=[
                 "/usr/include/libsecret-1",
-                "/usr/lib64/glib-2.0/include",
-                "/usr/lib/x86_64-linux-gnu/glib-2.0/include",
                 "/usr/include/glib-2.0",
-                "./third_party/pybind11/include",
+                "/usr/lib/glib-2.0/include",
+                "/usr/lib/x86_64-linux-gnu/glib-2.0/include",
+                "/usr/lib64/glib-2.0/include",
+                get_include(),
             ],
             language="c++",
         )
@@ -38,7 +40,7 @@ elif "Darwin" == platform.system():
         Extension(
             "pycreds._pycreds",
             sources=["./pycreds/pycreds_darwin.cpp"],
-            include_dirs=["./third_party/pybind11/include"],
+            include_dirs=[get_include()],
             language="c++",
             extra_compile_args=[
                 "-std=c++14",
@@ -82,5 +84,4 @@ setup(
         "cli": ["click==7.1.2"],
     },
     entry_points={"console_scripts": ["pycreds=pycreds.cli:main"]},
-    setup_requires=["setuptools_scm", "wheel"],
 )
