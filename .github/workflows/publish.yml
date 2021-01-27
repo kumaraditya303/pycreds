@@ -23,7 +23,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install --upgrade pip twine wheel build
+          pip install --upgrade pip
+          pip install --upgrade twine wheel build
           pip install -r requirements.txt
       - name: Build and publish
         env:
@@ -54,7 +55,8 @@ jobs:
           python-version: 3.9
       - name: Install dependencies
         run: |
-          pip install --upgrade pip twine wheel build
+          pip install --upgrade pip
+          pip install --upgrade twine wheel build
           pip install -r requirements.txt
       - name: Build and publish
         env:
