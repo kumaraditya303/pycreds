@@ -15,7 +15,6 @@ if "Windows" == platform.system():
             sources=["./pycreds/pycreds_win.cpp"],
             include_dirs=[get_include()],
             language="c++",
-            extra_compile_args=["/MT"],
         )
     )
 elif "Linux" == platform.system():
