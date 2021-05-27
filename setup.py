@@ -80,7 +80,7 @@ setup(
     use_scm_version=True,
     python_requires=">=3.7",
     extras_require={
-        "cli": ["click==7.1.2"],
+        "cli": ["click==8.0.1"],
     },
     entry_points={"console_scripts": ["pycreds=pycreds.cli:main"]},
 )
