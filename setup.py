@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import platform
+import sys
 from pathlib import Path
 
 from pybind11 import get_include
@@ -7,22 +7,22 @@ from setuptools import Extension, setup
 
 ext_modules = []
 
-if "Windows" == platform.system():
+if sys.platform == "win32":
     ext_modules.append(
         Extension(
             "pycreds._pycreds",
             libraries=["advapi32"],
-            sources=["./pycreds/pycreds_win.cpp"],
+            sources=["./pycreds/pycreds.cpp"],
             include_dirs=[get_include()],
             language="c++",
         )
     )
-elif "Linux" == platform.system():
+elif sys.platform == "linux":
     ext_modules.append(
         Extension(
             "pycreds._pycreds",
             libraries=["glib-2.0", "secret-1"],
-            sources=["./pycreds/pycreds_posix.cpp"],
+            sources=["./pycreds/pycreds.cpp"],
             include_dirs=[
                 "/usr/include/libsecret-1",
                 "/usr/include/glib-2.0",
@@ -34,11 +34,11 @@ elif "Linux" == platform.system():
             language="c++",
         )
     )
-elif "Darwin" == platform.system():
+elif sys.platform == "darwin":
     ext_modules.append(
         Extension(
             "pycreds._pycreds",
-            sources=["./pycreds/pycreds_darwin.cpp"],
+            sources=["./pycreds/pycreds.cpp"],
             include_dirs=[get_include()],
             language="c++",
             extra_compile_args=[
