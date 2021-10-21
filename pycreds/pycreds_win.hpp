@@ -176,4 +176,3 @@ py::object findCredentials(std::string &service)
   ::CredFree(creds);
   return credentials;
 }
-
