@@ -1,4 +1,4 @@
-click==8.1.1
+click==8.0.3
 docker==5.0.3
 pre-commit==2.15.0
 pytest==6.2.5
